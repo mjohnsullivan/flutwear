@@ -1,6 +1,8 @@
 import 'dart:math' show min;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:meta/meta.dart';
 
 class WatchFace extends StatelessWidget {
   @override
@@ -78,4 +80,48 @@ class PulseTimeState extends State<PulseTime>
       ),
     );
   }
+}
+
+class AmbientMode extends StatefulWidget {
+  AmbientMode({@required this.ambientChild, @required this.child});
+  final Widget ambientChild;
+  final Widget child;
+
+  @override
+  createState() => new _AmbientState();
+}
+
+class _AmbientState extends State<AmbientMode> {
+  static const platformAmbient =
+      const MethodChannel('com.mjohnsullivan.flutwear/ambient');
+
+  bool inAmbient = false;
+
+  @override
+  initState() {
+    super.initState();
+
+    platformAmbient.setMethodCallHandler((call) {
+      switch (call.method) {
+        case 'enter':
+          print('Entering ambient');
+          if (!inAmbient) setState(() => inAmbient = true);
+          break;
+        case 'exit':
+          print('Exiting ambient');
+          if (inAmbient) setState(() => inAmbient = false);
+          break;
+        case 'update':
+          print('Updating ambient');
+          setState(() => inAmbient = true);
+          break;
+        default:
+          print('Unknown message');
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      inAmbient ? widget.ambientChild : widget.child;
 }

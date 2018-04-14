@@ -8,20 +8,34 @@ class AmbientWatchFace extends StatelessWidget {
   Widget build(BuildContext context) => new Scaffold(
       backgroundColor: Colors.black,
       body: new Center(
-        child: new TimeDisplay(interval: const Duration(minutes: 1)),
+        child: new UpdatingTimeDisplay(interval: const Duration(minutes: 1)),
       ));
 }
 
+/// Displays the time at the creation of the widget
+class TimeDisplay extends StatelessWidget {
+  static String get _buildTime {
+    final time = new DateTime.now();
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '${time.hour}:$minute';
+  }
+
+  @override
+  Widget build(BuildContext context) => new Text(_buildTime,
+      style:
+          Theme.of(context).textTheme.display1.copyWith(color: Colors.white));
+}
+
 /// Displays the time, updating on an interval state by duration
-class TimeDisplay extends StatefulWidget {
-  TimeDisplay({@required this.interval});
+class UpdatingTimeDisplay extends StatefulWidget {
+  UpdatingTimeDisplay({@required this.interval});
   final Duration interval;
 
   @override
   createState() => new _TimeDisplayState();
 }
 
-class _TimeDisplayState extends State<TimeDisplay> {
+class _TimeDisplayState extends State<UpdatingTimeDisplay> {
   String _timeStr;
   Timer _timer;
 
@@ -41,9 +55,8 @@ class _TimeDisplayState extends State<TimeDisplay> {
 
   static String _buildTime() {
     final time = new DateTime.now();
-    final second = time.second.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
-    return '${time.hour}:$minute:$second';
+    return '${time.hour}:$minute';
   }
 
   @override
