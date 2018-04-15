@@ -1,13 +1,20 @@
 import 'dart:math' show min;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:meta/meta.dart';
+
+import 'package:flutwear/wear.dart';
+import 'package:flutwear/utils.dart';
 
 class WatchFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    var screenSize = MediaQuery.of(context).size;
+    final shape = InheritedShape.of(context).shape;
+    if (shape == Shape.round) {
+      screenSize = new Size(
+          boxInsetLength(screenSize.width), boxInsetLength(screenSize.height));
+    }
+
     return new Scaffold(
       body: new Center(
         child: new Stack(
@@ -38,7 +45,7 @@ class PulseTimeState extends State<PulseTime>
     with SingleTickerProviderStateMixin {
   Animation<double> animation;
   AnimationController controller;
-  String _timeStr = _buildTime();
+  String _timeStr = buildTime(seconds: true);
 
   initState() {
     super.initState();
@@ -50,7 +57,7 @@ class PulseTimeState extends State<PulseTime>
     animation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         controller.reverse();
-        setState(() => _timeStr = _buildTime());
+        setState(() => _timeStr = buildTime(seconds: true));
       } else if (status == AnimationStatus.dismissed) controller.forward();
     });
     controller.forward();
@@ -60,13 +67,6 @@ class PulseTimeState extends State<PulseTime>
   dispose() {
     controller.dispose();
     super.dispose();
-  }
-
-  static String _buildTime() {
-    final time = new DateTime.now();
-    final second = time.second.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '${time.hour}:$minute:$second';
   }
 
   @override
@@ -80,48 +80,4 @@ class PulseTimeState extends State<PulseTime>
       ),
     );
   }
-}
-
-class AmbientMode extends StatefulWidget {
-  AmbientMode({@required this.ambientChild, @required this.child});
-  final Widget ambientChild;
-  final Widget child;
-
-  @override
-  createState() => new _AmbientState();
-}
-
-class _AmbientState extends State<AmbientMode> {
-  static const platformAmbient =
-      const MethodChannel('com.mjohnsullivan.flutwear/ambient');
-
-  bool inAmbient = false;
-
-  @override
-  initState() {
-    super.initState();
-
-    platformAmbient.setMethodCallHandler((call) {
-      switch (call.method) {
-        case 'enter':
-          print('Entering ambient');
-          if (!inAmbient) setState(() => inAmbient = true);
-          break;
-        case 'exit':
-          print('Exiting ambient');
-          if (inAmbient) setState(() => inAmbient = false);
-          break;
-        case 'update':
-          print('Updating ambient');
-          setState(() => inAmbient = true);
-          break;
-        default:
-          print('Unknown message');
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) =>
-      inAmbient ? widget.ambientChild : widget.child;
 }

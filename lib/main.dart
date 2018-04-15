@@ -1,10 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutwear/ambient.dart';
 import 'package:flutwear/watchface.dart';
-import 'package:meta/meta.dart';
+import 'package:flutwear/wear.dart';
 
 void main() => runApp(new MyApp());
 
@@ -12,59 +10,42 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-        title: 'Flutter Demo',
-        theme: new ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: new WatchFaceShape(
-          squareChild: new AmbientMode(
-              child: new WatchFace(), ambientChild: new AmbientWatchFace()),
-          roundChild: new AmbientMode(
-              child: new WatchFace(), ambientChild: new AmbientWatchFace()),
-        ));
+      title: 'Flutter Demo',
+      theme: new ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: new WatchApp(),
+    );
   }
 }
 
-enum Shape { square, round }
-
-class WatchFaceShape extends StatefulWidget {
-  WatchFaceShape({@required this.squareChild, @required this.roundChild});
-  final Widget squareChild;
-  final Widget roundChild;
-
+/// Explicitly listens for ambient updates from WearOS and
+/// handles redrawing the ambient watch face
+class WatchApp extends StatefulWidget {
   @override
-  createState() => new _WatchFaceShapeState();
+  createState() => new _WatchAppState();
 }
 
-class _WatchFaceShapeState extends State<WatchFaceShape> {
-  static const platform =
-      const MethodChannel('com.mjohnsullivan.flutwear/shape');
-
-  var shape = Shape.square;
+class _WatchAppState extends State<WatchApp> {
+  Widget ambient;
 
   @override
-  void initState() {
+  initState() {
     super.initState();
-    _getShape();
+    _ambientUpdate();
   }
 
-  Future<Null> _getShape() async {
-    Shape shape;
-    try {
-      final int result = await platform.invokeMethod('shape');
-      shape = result == 1 ? Shape.square : Shape.round;
-    } on PlatformException catch (e) {
-      // Default to round
-      print(e);
-      shape = Shape.round;
-    }
-
-    setState(() {
-      shape;
-    });
+  _ambientUpdate() {
+    setState(() => ambient = new AmbientWatchFace());
   }
 
   @override
-  Widget build(BuildContext context) =>
-      shape == Shape.square ? widget.squareChild : widget.roundChild;
+  Widget build(BuildContext context) {
+    return new WatchShape(
+      square: new AmbientMode(
+          child: new WatchFace(), ambient: ambient, update: _ambientUpdate),
+      round: new AmbientMode(
+          child: new WatchFace(), ambient: ambient, update: _ambientUpdate),
+    );
+  }
 }
