@@ -3,27 +3,38 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
+String _buildTime() {
+  final time = new DateTime.now();
+  final minute = time.minute.toString().padLeft(2, '0');
+  return '${time.hour}:$minute';
+}
+
 class AmbientWatchFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) => new Scaffold(
       backgroundColor: Colors.black,
       body: new Center(
-        child: new UpdatingTimeDisplay(interval: const Duration(minutes: 1)),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          // child: new UpdatingTimeDisplay(interval: const Duration(minutes: 1)),
+          children: [
+            new TimeDisplay(),
+            new FlutterLogo(size: 50.0),
+          ],
+        ),
       ));
 }
 
 /// Displays the time at the creation of the widget
 class TimeDisplay extends StatelessWidget {
-  static String get _buildTime {
-    final time = new DateTime.now();
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '${time.hour}:$minute';
-  }
-
   @override
-  Widget build(BuildContext context) => new Text(_buildTime,
-      style:
-          Theme.of(context).textTheme.display1.copyWith(color: Colors.white));
+  Widget build(BuildContext context) => new Text(_buildTime(),
+      style: Theme
+          .of(context)
+          .textTheme
+          .display1
+          .copyWith(color: Colors.white, fontSize: 50.0));
 }
 
 /// Displays the time, updating on an interval state by duration
@@ -51,12 +62,6 @@ class _TimeDisplayState extends State<UpdatingTimeDisplay> {
   dispose() {
     _timer.cancel();
     super.dispose();
-  }
-
-  static String _buildTime() {
-    final time = new DateTime.now();
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '${time.hour}:$minute';
   }
 
   @override
