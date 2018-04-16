@@ -14,9 +14,6 @@ import io.flutter.app.FlutterActivity
 import io.flutter.view.FlutterView
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-
 
 
 private const val ambientChannel = "com.mjohnsullivan.flutwear/ambient"
