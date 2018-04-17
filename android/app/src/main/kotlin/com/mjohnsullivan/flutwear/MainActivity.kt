@@ -1,14 +1,12 @@
 package com.mjohnsullivan.flutwear
 
 import android.os.Bundle
-import android.support.v4.view.OnApplyWindowInsetsListener
 import android.support.v4.view.ViewCompat.requestApplyInsets
 import android.support.v4.view.ViewCompat.setOnApplyWindowInsetsListener
 import android.support.v4.view.WindowInsetsCompat
 
 import android.support.wear.ambient.AmbientMode
 import android.util.Log
-import android.view.View
 
 import io.flutter.app.FlutterActivity
 import io.flutter.view.FlutterView
@@ -20,6 +18,8 @@ private const val ambientChannel = "com.mjohnsullivan.flutwear/ambient"
 private const val shapeChannel = "com.mjohnsullivan.flutwear/shape"
 
 class MainActivity: FlutterActivity(), AmbientMode.AmbientCallbackProvider {
+
+  private val tag = "FlutterActivity"
 
   private var mAmbientController: AmbientMode.AmbientController? = null
 
@@ -34,40 +34,30 @@ class MainActivity: FlutterActivity(), AmbientMode.AmbientCallbackProvider {
     // Set the Flutter ambient callbacks
     mAmbientController = AmbientMode.attachAmbientSupport(this)
 
-    // Passes the watch face shape to Flutter through the shapeChannel
+    // Set a MethodChannel to return the shape of the watch
+    setShapeMethodChannel()
+  }
+
+  // Set up the MethodChannel for Flutter to retrieve the watch face shape
+  private fun setShapeMethodChannel() {
     MethodChannel(flutterView, shapeChannel).setMethodCallHandler { _, result ->
-      setOnApplyWindowInsetsListener(flutterView, MyOnApplyWindowInsetsListener(result))
+      setOnApplyWindowInsetsListener(flutterView, {_, insets: WindowInsetsCompat? ->
+        if (insets?.isRound == true) {
+          Log.d(tag, "round watch face")
+          result.success(0)
+        }
+        else {
+          Log.d(tag, "square watch face")
+          result.success(1)
+        }
+        WindowInsetsCompat(insets)
+      })
       requestApplyInsets(flutterView)
     }
   }
 
-  override fun onPause() {
-    MethodChannel(flutterView, ambientChannel).invokeMethod("unknown", null)
-    super.onPause()
-  }
-
   override fun getAmbientCallback(): AmbientMode.AmbientCallback {
     return FlutterAmbientCallback(flutterView)
-  }
-}
-
-/*
- * Passes watch face shape back through the
- */
-private class MyOnApplyWindowInsetsListener(val result: MethodChannel.Result) : OnApplyWindowInsetsListener {
-
-  private val tag = "Watch Face Shape Detect"
-
-  override fun onApplyWindowInsets(v: View?, insets: WindowInsetsCompat?): WindowInsetsCompat {
-    if (insets?.isRound == true) {
-      Log.d(tag, "round watchface")
-      result.success(0)
-    }
-    else {
-      Log.d(tag, "square watchface")
-      result.success(1)
-    }
-    return WindowInsetsCompat(insets)
   }
 }
 
