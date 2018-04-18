@@ -3,11 +3,28 @@ import 'package:flutter/services.dart';
 /// Receives messages that determines if the watch is in full power or
 /// ambient mode and renders the appropriate widget for that mode
 
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 /// Shape of a watch
 enum Shape { square, round }
+
+/// Method channel for retrieving the watch face shape
+const shapePlatform = const MethodChannel('com.mjohnsullivan.flutwear/shape');
+
+/// Fetches the shape of the watch face
+Future<Shape> _getShape() async {
+  try {
+    final int result = await shapePlatform.invokeMethod('shape');
+    return result == 1 ? Shape.square : Shape.round;
+  } on PlatformException catch (e) {
+    // Default to round
+    print('Error detecting shape: $e');
+    return Shape.round;
+  }
+}
 
 /// Widget that's aware of whether a watch is in full power or ambient mode,
 /// and renders the appropriate child for each mode. Optionally takes an
@@ -71,10 +88,7 @@ class WatchShape extends StatefulWidget {
 }
 
 class _WatchShapeState extends State<WatchShape> {
-  static const platform =
-      const MethodChannel('com.mjohnsullivan.flutwear/shape');
-
-  var shape = Shape.square;
+  var shape = Shape.round;
 
   @override
   void initState() {
@@ -85,7 +99,7 @@ class _WatchShapeState extends State<WatchShape> {
   _getShape() async {
     Shape shape;
     try {
-      final int result = await platform.invokeMethod('shape');
+      final int result = await shapePlatform.invokeMethod('shape');
       shape = result == 1 ? Shape.square : Shape.round;
     } on PlatformException catch (e) {
       // Default to round
@@ -105,7 +119,6 @@ class _WatchShapeState extends State<WatchShape> {
 }
 
 /// An inherited widget that holds the shape of the Watch
-/// It will default to round if the shape is unavailable
 class InheritedShape extends InheritedWidget {
   const InheritedShape({Key key, @required this.shape, @required Widget child})
       : assert(shape != null),
@@ -120,4 +133,43 @@ class InheritedShape extends InheritedWidget {
 
   @override
   bool updateShouldNotify(InheritedShape old) => shape != old.shape;
+}
+
+/// Builds a child for a WatchFaceBuilder
+typedef Widget WatchShapeWidgetBuilder(
+  BuildContext context,
+  Shape shape,
+);
+
+/// Builder widget for watch shapes
+class WatchShapeBuilder extends StatefulWidget {
+  WatchShapeBuilder({Key key, @required this.builder})
+      : assert(builder != null),
+        super(key: key);
+  final WatchShapeWidgetBuilder builder;
+
+  @override
+  createState() => new _WatchShapeBuilderState();
+}
+
+class _WatchShapeBuilderState extends State<WatchShapeBuilder> {
+  Shape shape;
+
+  @override
+  void initState() {
+    super.initState();
+    // Default to round until the platform returns the shape
+    // round being the most common form factor for WearOS
+    shape = Shape.round;
+    _setShape();
+  }
+
+  /// Sets the watch face shape
+  _setShape() async {
+    shape = await _getShape();
+    setState(() => shape);
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, shape);
 }

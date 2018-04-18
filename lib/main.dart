@@ -41,11 +41,21 @@ class _WatchAppState extends State<WatchApp> {
 
   @override
   Widget build(BuildContext context) {
-    return new WatchShape(
-      square: new AmbientMode(
-          child: new WatchFace(), ambient: ambient, update: _ambientUpdate),
-      round: new AmbientMode(
-          child: new WatchFace(), ambient: ambient, update: _ambientUpdate),
-    );
+    // Using this will return in both trees being rendere, when only one is needed
+    // return new WatchShape(
+    //   square: new AmbientMode(
+    //       child: new WatchFace(), ambient: ambient, update: _ambientUpdate),
+    //   round: new AmbientMode(
+    //       child: new WatchFace(), ambient: ambient, update: _ambientUpdate),
+    // );
+
+    // Using this will let you decide at runtime what to do when the shape is known
+    return new WatchShapeBuilder(
+        builder: (context, shape) => new InheritedShape(
+            shape: shape,
+            child: new AmbientMode(
+                child: new WatchFace(),
+                ambient: ambient,
+                update: _ambientUpdate)));
   }
 }
