@@ -43,11 +43,11 @@ class MainActivity: FlutterActivity(), AmbientMode.AmbientCallbackProvider {
     MethodChannel(flutterView, shapeChannel).setMethodCallHandler { _, result ->
       setOnApplyWindowInsetsListener(flutterView, {_, insets: WindowInsetsCompat? ->
         if (insets?.isRound == true) {
-          Log.d(tag, "round watch face")
+          Log.d(tag, "Android: round watch face")
           result.success(0)
         }
         else {
-          Log.d(tag, "square watch face")
+          Log.d(tag, "Android: square watch face")
           result.success(1)
         }
         WindowInsetsCompat(insets)
@@ -55,6 +55,7 @@ class MainActivity: FlutterActivity(), AmbientMode.AmbientCallbackProvider {
       requestApplyInsets(flutterView)
     }
   }
+
 
   override fun getAmbientCallback(): AmbientMode.AmbientCallback {
     return FlutterAmbientCallback(flutterView)
@@ -66,23 +67,23 @@ class MainActivity: FlutterActivity(), AmbientMode.AmbientCallbackProvider {
  */
 private class FlutterAmbientCallback(val flutterView: FlutterView): AmbientMode.AmbientCallback() {
 
-  private val tag = "Ambient Callback"
+  private val tag = "Android: Ambient Callback"
   
   override fun onEnterAmbient(ambientDetails: Bundle) {
     MethodChannel(flutterView, ambientChannel).invokeMethod("enter", null)
-    Log.d(tag, "Entering Ambient")
+    Log.d(tag, "Android: Entering Ambient")
     super.onEnterAmbient(ambientDetails)
   }
 
   override fun onExitAmbient() {
     MethodChannel(flutterView, ambientChannel).invokeMethod("exit", null)
-    Log.d(tag, "Exiting Ambient")
+    Log.d(tag, "Android: Exiting Ambient")
     super.onExitAmbient()
   }
 
   override fun onUpdateAmbient() {
     MethodChannel(flutterView, ambientChannel).invokeMethod("update", null)
-    Log.d(tag, "Updating Ambient")
+    Log.d(tag, "Android: Updating Ambient")
     super.onUpdateAmbient()
   }
 

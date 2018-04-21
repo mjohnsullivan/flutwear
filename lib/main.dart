@@ -4,58 +4,27 @@ import 'package:flutwear/ambient.dart';
 import 'package:flutwear/watchface.dart';
 import 'package:flutwear/wear.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(WatchApp());
 
-class MyApp extends StatelessWidget {
+class WatchApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Flutter Demo',
-      theme: new ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: new WatchApp(),
-    );
-  }
+  Widget build(BuildContext context) => MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: WatchScreen(),
+      );
 }
 
-/// Explicitly listens for ambient updates from WearOS and
-/// handles redrawing the ambient watch face
-class WatchApp extends StatefulWidget {
+/// Manages the shape of the watch face and ambient mode
+class WatchScreen extends StatelessWidget {
   @override
-  createState() => new _WatchAppState();
-}
-
-class _WatchAppState extends State<WatchApp> {
-  Widget ambient;
-
-  @override
-  initState() {
-    super.initState();
-    _ambientUpdate();
-  }
-
-  _ambientUpdate() {
-    setState(() => ambient = new AmbientWatchFace());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Using this will return in both trees being rendere, when only one is needed
-    // return new WatchShape(
-    //   square: new AmbientMode(
-    //       child: new WatchFace(), ambient: ambient, update: _ambientUpdate),
-    //   round: new AmbientMode(
-    //       child: new WatchFace(), ambient: ambient, update: _ambientUpdate),
-    // );
-
-    // Using this will let you decide at runtime what to do when the shape is known
-    return new WatchShapeBuilder(
-        builder: (context, shape) => new InheritedShape(
-            shape: shape,
-            child: new AmbientMode(
-                child: new WatchFace(),
-                ambient: ambient,
-                update: _ambientUpdate)));
-  }
+  Widget build(BuildContext context) => WatchShape(
+      builder: (context, shape) => InheritedShape(
+          shape: shape,
+          child: AmbientMode(
+            builder: (context, mode) =>
+                mode == Mode.active ? WatchFace() : AmbientWatchFace(),
+          )));
 }
