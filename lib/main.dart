@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:wear/wear.dart';
+
 import 'package:flutwear/ambient.dart';
 import 'package:flutwear/watchface.dart';
-import 'package:flutwear/wear.dart';
 
 void main() => runApp(WatchApp());
 

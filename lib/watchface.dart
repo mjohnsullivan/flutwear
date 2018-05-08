@@ -2,7 +2,8 @@ import 'dart:math' show min;
 
 import 'package:flutter/material.dart';
 
-import 'package:flutwear/wear.dart';
+import 'package:wear/wear.dart';
+
 import 'package:flutwear/utils.dart';
 
 class WatchFace extends StatelessWidget {
