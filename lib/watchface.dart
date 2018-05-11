@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:wear/wear.dart';
 
+import 'package:flutwear/widgets.dart';
 import 'package:flutwear/utils.dart';
 
 class WatchFace extends StatelessWidget {
@@ -16,17 +17,22 @@ class WatchFace extends StatelessWidget {
       screenSize = Size(boxInsetLength(screenSize.width / 2),
           boxInsetLength(screenSize.height / 2));
     }
-
     return Scaffold(
+      backgroundColor: Colors.blueGrey[900],
       body: Center(
         child: Stack(
           alignment: AlignmentDirectional.center,
           children: <Widget>[
             Opacity(
-                opacity: 0.5,
+                opacity: 0.3,
                 child: FlutterLogo(
                     size: min(screenSize.width, screenSize.height))),
-            PulseTime(style: Theme.of(context).textTheme.display1),
+            PulseTime(
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .display1
+                    .copyWith(color: Colors.white)),
           ],
         ),
       ),
@@ -34,6 +40,7 @@ class WatchFace extends StatelessWidget {
   }
 }
 
+/// Pulses the scale of a time Text widget
 class PulseTime extends StatefulWidget {
   PulseTime({this.style});
   final TextStyle style;
@@ -42,7 +49,6 @@ class PulseTime extends StatefulWidget {
   createState() => PulseTimeState();
 }
 
-/// Pulses the scale of a time Text widget
 class PulseTimeState extends State<PulseTime>
     with SingleTickerProviderStateMixin {
   Animation<double> animation;
@@ -60,7 +66,9 @@ class PulseTimeState extends State<PulseTime>
       if (status == AnimationStatus.completed) {
         controller.reverse();
         setState(() => _timeStr = buildTime(seconds: true));
-      } else if (status == AnimationStatus.dismissed) controller.forward();
+      } else if (status == AnimationStatus.dismissed) {
+        controller.forward();
+      }
     });
     controller.forward();
   }
