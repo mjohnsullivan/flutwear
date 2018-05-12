@@ -16,6 +16,7 @@ class WatchApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: WatchScreen(),
+        debugShowCheckedModeBanner: false,
       );
 }
 

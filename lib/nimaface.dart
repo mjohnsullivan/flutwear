@@ -1,10 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import 'package:nima/nima_actor.dart';
+import 'package:wear/wear.dart';
 
 import 'package:flutwear/widgets.dart';
+import 'package:flutwear/utils.dart';
 
 class HopCharacter extends StatefulWidget {
   @override
@@ -19,15 +21,11 @@ class _HopCharacterState extends State<HopCharacter> {
   void initState() {
     super.initState();
 
-    _timer = Timer.periodic(Duration(seconds: 1), (_) {
-      setState(() {
-        if (DateTime.now().second == 0) {
-          _actionName = 'attack';
-        } else {
-          _actionName = 'jump';
-        }
-      });
-    });
+    _timer = Timer.periodic(
+        Duration(seconds: 2),
+        (_) => setState(() => DateTime.now().second < 2
+            ? _actionName = 'attack'
+            : _actionName = 'jump'));
   }
 
   @override
@@ -38,38 +36,34 @@ class _HopCharacterState extends State<HopCharacter> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: const Alignment(0.0, 1.0),
-      children: [
-        NimaActor('assets/hop',
-            alignment: Alignment.center,
-            fit: BoxFit.contain,
-            animation: _actionName, completed: (_) {
-          print('Completed action $_actionName');
-          setState(() => _actionName = 'idle');
-        }),
-        TimeDisplay(fontSize: 30.0),
-      ],
+    var screenSize = MediaQuery.of(context).size;
+    final shape = InheritedShape.of(context).shape;
+    final screenWidth = shape == Shape.round
+        ? boxInsetLength(screenSize.width / 2)
+        : screenSize.width;
+    final screenHeight = shape == Shape.round
+        ? boxInsetLength(screenSize.height / 2)
+        : screenSize.height;
+    return new Scaffold(
+      body: Center(
+        child: Container(
+          //constraints:
+          //    BoxConstraints(maxWidth: screenWidth, maxHeight: screenHeight),
+          color: Colors.black,
+          child: Stack(
+            alignment: const Alignment(0.0, 0.9),
+            children: [
+              NimaActor('assets/hop',
+                  alignment: Alignment.center,
+                  fit: BoxFit.contain,
+                  animation: _actionName,
+                  mixSeconds: 0.5,
+                  completed: (_) => setState(() => _actionName = 'idle')),
+              TimeDisplay(fontSize: 30.0),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
-
-/*
-@override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          child: NimaActor('assets/hop',
-              alignment: Alignment.bottomRight,
-              fit: BoxFit.contain,
-              animation: _actionName, completed: (_) {
-            print('Completed action $_actionName');
-            setState(() => _actionName = 'idle');
-          }),
-        ),
-        TimeDisplay(),
-      ],
-    );
-*/

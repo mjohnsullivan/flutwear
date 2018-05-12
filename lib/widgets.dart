@@ -9,15 +9,12 @@ class TimeDisplay extends StatelessWidget {
   final double fontSize;
 
   @override
-  Widget build(BuildContext context) {
-    print('Rebuilding time display');
-    return Text(buildTime(),
-        style: Theme
-            .of(context)
-            .textTheme
-            .display1
-            .copyWith(color: Colors.blueGrey, fontSize: fontSize));
-  }
+  Widget build(BuildContext context) => Text(buildTime(),
+      style: Theme
+          .of(context)
+          .textTheme
+          .display1
+          .copyWith(color: Colors.blueGrey, fontSize: fontSize));
 }
 
 /// Displays text with a shadow
