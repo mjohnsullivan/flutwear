@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutwear/utils.dart';
+import 'package:flutwear/widgets.dart';
 
 class AmbientWatchFace extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => new Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       backgroundColor: Colors.black,
       body: Center(
         child: Column(
@@ -16,15 +16,4 @@ class AmbientWatchFace extends StatelessWidget {
           ],
         ),
       ));
-}
-
-/// Displays the time at the creation of the widget
-class TimeDisplay extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Text(buildTime(),
-      style: Theme
-          .of(context)
-          .textTheme
-          .display1
-          .copyWith(color: Colors.blueGrey, fontSize: 50.0));
 }
