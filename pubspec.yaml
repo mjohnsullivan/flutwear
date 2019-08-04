@@ -1,13 +1,16 @@
 name: flutwear
 description: A new Flutter project.
 
+environment:
+  sdk: ">=2.2.2 <3.0.0"
+
 dependencies:
   flutter:
     sdk: flutter
 
-  wear: ^0.0.2
+  wear: ^0.0.3
 
-  nima: ^1.0.0
+  nima: ^1.0.5
 
   cupertino_icons: ^0.1.0
 

@@ -53,7 +53,7 @@ class _HopCharacterState extends State<HopCharacter> {
           child: Stack(
             alignment: const Alignment(0.0, 0.9),
             children: [
-              NimaActor('assets/hop',
+              NimaActor('assets/hop.nima',
                   alignment: Alignment.center,
                   fit: BoxFit.contain,
                   animation: _actionName,
